@@ -1,0 +1,86 @@
+A Partition merger script is also available to automatically merge product partition.
+I have attached the file (makedynamic.sh) in this gist, you can also find it here in ErfanGSIs group - https://t.me/ErfanGSIs/528324
+
+Usage:
+sudo ./makedynamic.sh <Firmware Type> [Path to Firmware]
+
+V2 Changelog:
+- Tested Pixel and OxygenOS support
+- Fixed Syntax errors
+
+Note:
+- This script is a addon for Erfans Tools, dont try to run without them
+-Give execution permissions before using -_-
+
+Credits - Telegram - @Debug101
+________________________________
+
+
+For people who want to boot OnePlus 7T/7T Pro Image here is the guide:
+
+We can use Erfan Tool but before that we need a modified system.img, since OnePlus 7T/7T Pro have dynamic partition.
+-Download and extract the payload.bin in the oneplus 7T/7T Pro ota using payload dumper.
+-Take out system.img, product.img and opproduct.img and place them in separate folder.
+
+
+Steps For making that system partition:
+
+1. Open terminal and type sudo su
+
+2. Then this for making a 4gb empty system_new.img
+  dd if=/dev/zero of=system_new.img bs=4k count=1048576
+   
+3. Formating the system_new.img with EXT4
+  mkfs.ext4 system_new.img   
+
+4. We override the file system check (If you don`t do this, the image will not work)
+  tune2fs -c0 -i0 system_new.img
+   
+5. Mount this system_new.img and the system.img from the ota package as mentioned above
+  mkdir system
+  mkdir system_new
+  
+  mount -o loop system_new.img system_new/
+  mount -o ro system.img system/
+  
+6. We copy the content from the old system.img in the system_new.img and sync them
+  cp -v -r -p system/* system_new/
+  sync
+  
+   Then,
+  umount system/
+  
+7. Open terminal in the mounted system_new.img and type
+  sudo rmdir product
+
+8. Now add a link file in system_new.img with link to system/product (i copied it from OnePlus 7 system.img which i mount separatly)
+  mkdir systemop7
+  mount -o loop system.img systemop7/
+  cp -v -r -p systemop7/product /system_new
+  umount systemop7/
+  
+   This will add the link file in system_new.img and then we will make the product directory in system_new/system which the link file is directing to.
+   Open terminal in system_new/system and type
+  sudo rm product
+  sudo mkdir product
+
+9. Now we have to mount the 7T product.img and copy its data to system_new.img and sync them
+  mkdir product
+  mount -o ro product.img product/
+  cp -v -r -p product/* /system_new/system/product
+  sync
+  umount product/
+
+10. Now we have to mount the 7T opproduct.img and copy its data to system_new.img and sync them
+   mkdir opproduct
+   mount -o ro opproduct.img opproduct/
+   cp -v -r -p opproduct/* /system_new/oneplus
+   sync
+   umount opproduct/
+   umount system_new/
+   
+11. Now take the system_new.img and rename it to system.img and zip to op7t.zip
+12. Run erfans tool on this zip now u will get your gsi
+   sudo ./url2gsi op7t.zip OxygenOS --ab
+   
+   
