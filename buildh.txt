@@ -1,5 +1,5 @@
 A Partition merger script is also available to automatically merge product partition.
-I have attached the file (makedynamic.sh) in this gist, you can also find it here in ErfanGSIs group - https://t.me/ErfanGSIs/528324
+I have attached the file (makedynamic.sh) in this gist, you can also find it here in this group - https://t.me/sukeeratbededraphael/13505
 
 Usage:
 sudo ./makedynamic.sh <Firmware Type> [Path to Firmware]
